@@ -1,7 +1,6 @@
 import * as Name from './name.js';
 import * as Action from './action.js';
 import * as Window from './window.js';
-import { SETTINGS } from './settings.js';
 
 let HOME_ID;
 const ROOT_IDS = new Set(['toolbar_____', 'menu________', 'unfiled_____']);
@@ -12,7 +11,7 @@ const nowUnstashing = new Set();
 /* --- INIT --- */
 
 // Identify the stash home's folder id based on settings.
-export async function init() {
+export async function init(SETTINGS) {
     let rootId = SETTINGS.stash_home; // Id of a root folder; may be followed by a marker character indicating that home is a subfolder
     let nodes;
     const isRoot = isRootId(rootId);
