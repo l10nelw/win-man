@@ -189,7 +189,7 @@ const openTab = ({ url, title }, windowId, active) => Action.openTab({ discarded
 
 /* --- */
 
-export const isCanUnstash = async nodeId =>
+export const canUnstash = async nodeId =>
     !( isRootId(nodeId) || nowStashing.has(nodeId) || nowUnstashing.has(nodeId) || isSeparator(await getNode(nodeId)) );
 
 const isRootId    = nodeId => ROOT_IDS.has(nodeId);
