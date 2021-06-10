@@ -39,7 +39,7 @@ async function init() {
         });
     }
 
-    await Window.init(windows);
+    await Window.add(windows);
     for (const window of windows) onWindowCreated(window, true);
 }
 
@@ -53,7 +53,7 @@ async function onWindowCreated(window, isInit) {
 
     if (isInit) return;
 
-    await Window.add(window);
+    await Window.add([window]);
     Menu?.update();
     Stash?.unstash.onWindowCreated(windowId);
     Action.selectFocusedTab(windowId);

@@ -10,22 +10,15 @@ let lastWindowNumber = 0;
 export const sortedWinfos = () => Object.values(winfoMap).sort(compareLastFocused);
 const compareLastFocused = (a, b) => b.lastFocused - a.lastFocused;
 
-export async function init(windows) {
-    // Perform equivalent of add() for every open window all at once.
-    let windowIds = [];
+export async function add(windows) {
+    const windowIds = [];
     for (const window of windows) {
         const windowId = window.id;
         windowIds.push(windowId);
         winfoMap[windowId] = createWinfo(window);
+        winfoMap[windowId].defaultName = createDefaultName(windowId);
     }
-    await nameWinfos(windowIds);
-}
-
-export async function add(window) {
-    const windowId = window.id;
-    if (windowId in winfoMap) return;
-    winfoMap[windowId] = createWinfo(window);
-    await nameWinfos([windowId]);
+    await Promise.all(windowIds.map(restoreGivenName));
 }
 
 export function remove(windowId) {
@@ -41,17 +34,10 @@ function createWinfo({ id, incognito }) {
     };
 }
 
-async function nameWinfos(windowIds) {
-    await Promise.all(windowIds.map(restoreGivenName));
-    for (const windowId of windowIds) {
-        winfoMap[windowId].defaultName = createDefaultName(windowId);
-        onWindowNamed(windowId);
-    }
-}
-
 async function restoreGivenName(windowId) {
     const givenName = await browser.sessions.getWindowValue(windowId, 'givenName');
     winfoMap[windowId].givenName = givenName ? Name.uniquify(givenName) : '';
+    onWindowNamed(windowId);
 }
 
 function createDefaultName(windowId) {
