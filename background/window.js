@@ -1,7 +1,6 @@
 import * as Name from './name.js';
 import { onWindowNamed } from './background.js';
 
-// An info-about-a-window object is called a "winfo". "Winfos" live here, acting as Winger's source-of-truth.
 export const winfoMap = {};
 
 export const defaultNameHead = 'Window ';
