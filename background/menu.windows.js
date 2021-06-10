@@ -53,7 +53,7 @@ export function updateAvailability() {
 // Clear and populate `context` menu with other-window menu items, sorted by lastFocsued.
 function populate(context, currentWindowId) {
     const properties = { contexts: [context], parentId: context };
-    for (const { id: windowId } of Window.sorted()) {
+    for (const { id: windowId } of Window.sortedWinfos()) {
         const id = menuId(context, windowId);
         browser.menus.remove(id);
         if (windowId === currentWindowId) continue;

@@ -1,3 +1,5 @@
+// Common actions involving windows and tabs.
+
 import { BRING, SEND } from '../modifier.js';
 import { winfoMap } from './window.js';
 import { SETTINGS } from './settings.js';

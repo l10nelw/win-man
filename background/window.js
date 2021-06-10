@@ -2,12 +2,13 @@ import * as Name from './name.js';
 import * as Title from './title.js';
 let Badge;
 
+// An info-about-a-window object is called a "winfo". "Winfos" live here, acting as Winger's source-of-truth.
 export const winfoMap = {};
 export const defaultNameHead = 'Window ';
 export let windowCount = 0;
 let lastWindowNumber = 0;
 
-export const sorted = () => Object.values(winfoMap).sort(compareLastFocused);
+export const sortedWinfos = () => Object.values(winfoMap).sort(compareLastFocused);
 const compareLastFocused = (a, b) => b.lastFocused - a.lastFocused;
 
 export async function init(SETTINGS, windows) {

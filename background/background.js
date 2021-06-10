@@ -71,7 +71,7 @@ async function onRequest(request) {
     if (request.popup) {
         return {
             SETTINGS:         Settings.SETTINGS,
-            winfos:            Window.sorted(),
+            winfos:            Window.sortedWinfos(),
             selectedTabCount: (await Action.getSelectedTabs()).length,
         };
     }
