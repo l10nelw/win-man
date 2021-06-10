@@ -6,42 +6,44 @@ let Badge, Stash, Menu; // Optional modules
 
 init();
 Settings.needsRestart(false);
-browser.runtime.onInstalled.addListener    (onExtInstalled);
+browser.runtime.onInstalled.addListener    (onExtensionInstalled);
 browser.windows.onCreated.addListener      (onWindowCreated);
 browser.windows.onRemoved.addListener      (onWindowRemoved);
 browser.windows.onFocusChanged.addListener (onWindowFocused);
 browser.runtime.onMessage.addListener      (onRequest);
 
 async function init() {
-    const [windows, SETTINGS] = await Promise.all([ browser.windows.getAll(), Settings.retrieve() ]);
+    const [SETTINGS, windows] = await Promise.all([ Settings.retrieve(), browser.windows.getAll() ]);
 
     Action.init(SETTINGS);
 
     if (SETTINGS.show_badge) {
-        Badge = await import('./badge.js');
+        import('./badge.js').then(module => {
+            Badge = module;
+        });
     }
-
     if (SETTINGS.enable_stash) {
-        Stash = await import('./stash.js');
-        Stash.init(SETTINGS);
+        import('./stash.js').then(module => {
+            Stash = module;
+            Stash.init(SETTINGS);
+        });
     }
-
-    await Window.init(windows);
-    for (const window of windows) onWindowCreated(window, true);
-
     const menusEnabled = [];
     if (SETTINGS.enable_tab_menu)  menusEnabled.push('tab');
     if (SETTINGS.enable_link_menu) menusEnabled.push('link');
     if (SETTINGS.enable_stash)     menusEnabled.push('bookmark');
     if (menusEnabled.length) {
-        Menu = await import('./menu.js');
-        Menu.init(menusEnabled);
+        import('./menu.js').then(module => {
+            Menu = module;
+            Menu.init(menusEnabled);
+        });
     }
 
-    // Object.assign(window, { Window, Action, Stash });
+    await Window.init(windows);
+    for (const window of windows) onWindowCreated(window, true);
 }
 
-function onExtInstalled(details) {
+function onExtensionInstalled(details) {
     if (details.reason === 'install') Action.openHelp();
 }
 

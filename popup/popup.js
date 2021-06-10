@@ -31,16 +31,15 @@ export const getActionElements = ($scope = $body, suffix = '') => $scope.querySe
 export let $currentWindowRow, $otherWindowRows, $allWindowRows;
 let modifierHints;
 
-(async () => {
-    const { default: init } = await import('./init.js');
-    ({ $currentWindowRow, $otherWindowRows, $allWindowRows, modifierHints } = await init());
+import('./init.js').then(async init => {
+    ({ $currentWindowRow, $otherWindowRows, $allWindowRows, modifierHints } = await init.default());
     $body.addEventListener('click', onClick);
     $body.addEventListener('contextmenu', onRightClick);
     $body.addEventListener('keydown', onKeyDown);
     $body.addEventListener('keyup', onKeyUp);
     $body.addEventListener('focusout', onFocusOut);
     $currentWindowRow.$input.addEventListener('dblclick', onDoubleClick);
-})();
+});
 
 function onClick(event) {
     const { target: $target } = event;
