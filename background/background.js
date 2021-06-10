@@ -1,7 +1,8 @@
 import * as Settings from './settings.js';
 import * as Window from './window.js';
 import * as Action from './action.js';
-let Stash, Menu; // Optional modules
+import * as Title from './title.js';
+let Badge, Stash, Menu; // Optional modules
 
 init();
 Settings.needsRestart(false);
@@ -16,12 +17,16 @@ async function init() {
 
     Action.init(SETTINGS);
 
+    if (SETTINGS.show_badge) {
+        Badge = await import('./badge.js');
+    }
+
     if (SETTINGS.enable_stash) {
         Stash = await import('./stash.js');
         Stash.init(SETTINGS);
     }
 
-    await Window.init(SETTINGS, windows);
+    await Window.init(windows);
     for (const window of windows) onWindowCreated(window, true);
 
     const menusEnabled = [];
@@ -83,6 +88,11 @@ async function onRequest(request) {
 
     // From popup/editmode.js
     if (request.giveName) return Window.giveName(request.windowId, request.name);
+}
+
+export function onWindowNamed(windowId) {
+    Title.update(windowId);
+    Badge?.update(windowId);
 }
 
 function debug() {

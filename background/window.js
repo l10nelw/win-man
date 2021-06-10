@@ -1,6 +1,5 @@
 import * as Name from './name.js';
-import * as Title from './title.js';
-let Badge;
+import { onWindowNamed } from './background.js';
 
 // An info-about-a-window object is called a "winfo". "Winfos" live here, acting as Winger's source-of-truth.
 export const winfoMap = {};
@@ -11,9 +10,7 @@ let lastWindowNumber = 0;
 export const sortedWinfos = () => Object.values(winfoMap).sort(compareLastFocused);
 const compareLastFocused = (a, b) => b.lastFocused - a.lastFocused;
 
-export async function init(SETTINGS, windows) {
-    if (SETTINGS.show_badge) Badge = await import('./badge.js');
-
+export async function init(windows) {
     // Perform equivalent of add() for every open window all at once.
     let windowIds = [];
     for (const window of windows) {
@@ -95,14 +92,9 @@ export function hasName(name, excludeId) {
     return 0;
 }
 
-function onWindowNamed(windowId) {
-    Title.update(windowId);
-    Badge?.update(windowId);
-}
-
 export function isOverOne() {
     let count = 0;
-    for (const _ in infoMap) {
+    for (const _ in winfoMap) {
         if (++count === 2) return true;
     }
     return false;
