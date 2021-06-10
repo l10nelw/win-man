@@ -2,7 +2,7 @@ import { BRING, SEND } from '../modifier.js';
 import { windowMap } from './metadata.js';
 import { SETTINGS } from './settings.js';
 
-export const openHelp = hash => openUniqueExtPage('help/help.html', hash);
+export const openHelp = hash => openUniqueExtensionPage('help/help.html', hash);
 export const getSelectedTabs = async () => await browser.tabs.query({ currentWindow: true, highlighted: true });
 export const switchWindow = windowId => browser.windows.update(windowId, { focused: true });
 
@@ -20,7 +20,7 @@ export function init() {
 }
 
 // Open extension page tab, closing any duplicates found.
-async function openUniqueExtPage(pathname, hash) {
+async function openUniqueExtensionPage(pathname, hash) {
     const url = browser.runtime.getURL(pathname);
     const openedTabs = await browser.tabs.query({ url });
     browser.tabs.remove(openedTabs.map(tab => tab.id));
@@ -34,14 +34,14 @@ export async function selectFocusedTab(windowId) {
 }
 
 // Given `windowId`, select action to execute based on `action` and `modifiers`.
-export async function doAction({ windowId, originWindowId, action, modifiers, tabs }) {
+export async function execute({ windowId, originWindowId, action, modifiers, tabs }) {
     const reopen = !isSamePrivateStatus(windowId, originWindowId);
     tabs = tabs || await getSelectedTabs();
-    action = modifyAction(action, modifiers);
+    action = modify(action, modifiers);
     actionMap[action](windowId, tabs, reopen);
 }
 
-function modifyAction(action, modifiers) {
+function modify(action, modifiers) {
     if (!modifiers.length) return action;
     return modifiers.includes(BRING) ? 'bring' :
            modifiers.includes(SEND)  ? 'send' :

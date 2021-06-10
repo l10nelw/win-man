@@ -5,7 +5,7 @@
 
 import * as Settings from './settings.js';
 import * as Metadata from './metadata.js';
-import * as WindowTab from './windowtab.js';
+import * as Action from './action.js';
 let Stash, Menu; // Optional modules
 
 init();
@@ -19,7 +19,7 @@ browser.runtime.onMessage.addListener      (onRequest);
 async function init() {
     const [windows, SETTINGS] = await Promise.all([ browser.windows.getAll(), Settings.retrieve() ]);
 
-    WindowTab.init(SETTINGS);
+    Action.init(SETTINGS);
 
     if (SETTINGS.enable_stash) {
         Stash = await import('./stash.js');
@@ -38,11 +38,11 @@ async function init() {
         Menu.init(menusEnabled);
     }
 
-    // Object.assign(window, { Metadata, WindowTab, Stash });
+    // Object.assign(window, { Metadata, Action, Stash });
 }
 
 function onExtInstalled(details) {
-    if (details.reason === 'install') WindowTab.openHelp();
+    if (details.reason === 'install') Action.openHelp();
 }
 
 async function onWindowCreated(window, isInit) {
@@ -54,7 +54,7 @@ async function onWindowCreated(window, isInit) {
     await Metadata.add(window);
     Menu?.update();
     Stash?.unstash.onWindowCreated(windowId);
-    WindowTab.selectFocusedTab(windowId);
+    Action.selectFocusedTab(windowId);
 }
 
 function onWindowRemoved(windowId) {
@@ -77,14 +77,14 @@ async function onRequest(request) {
         return {
             SETTINGS:         Settings.SETTINGS,
             metaWindows:      Metadata.sorted(),
-            selectedTabCount: (await WindowTab.getSelectedTabs()).length,
+            selectedTabCount: (await Action.getSelectedTabs()).length,
         };
     }
 
     // From popup/popup.js
     if (request.stash) return Stash.stash(request.stash);
-    if (request.action) return WindowTab.doAction(request);
-    if (request.help) return WindowTab.openHelp();
+    if (request.action) return Action.execute(request);
+    if (request.help) return Action.openHelp();
 
     // From popup/editmode.js
     if (request.giveName) return Metadata.giveName(request.windowId, request.name);

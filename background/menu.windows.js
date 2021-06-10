@@ -1,6 +1,6 @@
 import { BRING } from '../modifier.js';
 import * as Metadata from './metadata.js';
-import * as WindowTab from './windowtab.js';
+import * as Action from './action.js';
 
 const enabledContexts = [];
 
@@ -69,6 +69,6 @@ function openLink(url, windowId, modifiers) {
 }
 
 async function moveTab(tab, windowId, modifiers, originWindowId) {
-    const tabs = tab.highlighted ? await WindowTab.getSelectedTabs() : [tab];
-    WindowTab.doAction({ action: 'send', windowId, originWindowId, modifiers, tabs });
+    const tabs = tab.highlighted ? await Action.getSelectedTabs() : [tab];
+    Action.execute({ action: 'send', windowId, originWindowId, modifiers, tabs });
 }

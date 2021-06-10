@@ -1,5 +1,5 @@
 import * as Name from './name.js';
-import * as WindowTab from './windowtab.js';
+import * as Action from './action.js';
 import * as Metadata from './metadata.js';
 import { SETTINGS } from './settings.js';
 
@@ -104,7 +104,7 @@ async function saveTabs(tabs, folderId) {
     const savingBookmarks = new Array(count);
     for (let i = count; i--;) { // Reverse iteration necessary for bookmarks to be in correct order
         const tab = tabs[i];
-        properties.url = WindowTab.deplaceholderize(tab.url);
+        properties.url = Action.deplaceholderize(tab.url);
         properties.title = tab.title;
         savingBookmarks[i] = createNode(properties);
     }
@@ -184,7 +184,7 @@ async function replaceInitTab({ windowId, initTabId }, bookmark, active) {
     browser.tabs.remove(initTabId);
 }
 
-const openTab = ({ url, title }, windowId, active) => WindowTab.openTab({ discarded: true, url, title, windowId, active });
+const openTab = ({ url, title }, windowId, active) => Action.openTab({ discarded: true, url, title, windowId, active });
 
 
 /* --- */
