@@ -3,7 +3,7 @@ import { $otherWindowsList, $toolbar, unsetActionAttr, requestStash } from './po
 import { $omnibox, commands } from './omnibox.js';
 import * as Status from './status.js';
 import * as Tooltip from './tooltip.js';
-import * as Modifier from '../modifier.js';
+import { BRING, SEND } from '../modifier.js';
 
 export default () => browser.runtime.sendMessage({ popup: true })
     .then(onSuccess)
@@ -139,7 +139,6 @@ const toolbar = {
 }
 
 function createModifierHints(selectedTabCount) {
-    const { BRING, SEND } = Modifier;
     const tabWord = selectedTabCount === 1 ? 'tab' : 'tabs';
     return {
         [BRING]: `${BRING.toUpperCase()}: Bring ${tabWord} to...`,

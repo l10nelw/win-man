@@ -7,7 +7,7 @@
 */
 
 import { isInput, hasClass } from '../utils.js';
-import * as Modifier from '../modifier.js';
+import { get as getModifier } from '../modifier.js';
 import * as Omnibox from './omnibox.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
@@ -130,7 +130,7 @@ export function requestAction(event, $action = event.target) {
         action,
         windowId,
         originWindowId: $currentWindowRow._id,
-        modifiers: Modifier.get(event),
+        modifiers: getModifier(event),
     });
     window.close();
 }

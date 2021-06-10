@@ -1,4 +1,4 @@
-import * as Modifier from '../modifier.js';
+import { BRING } from '../modifier.js';
 import * as Metadata from './metadata.js';
 import * as WindowTab from './windowtab.js';
 
@@ -65,7 +65,7 @@ function populate(context, currentWindowId) {
 
 function openLink(url, windowId, modifiers) {
     browser.tabs.create({ windowId, url });
-    if (modifiers.includes(Modifier.BRING)) WindowTab.switchWindow(windowId);
+    if (modifiers.includes(BRING)) Action.switchWindow(windowId);
 }
 
 async function moveTab(tab, windowId, modifiers, originWindowId) {
