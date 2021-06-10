@@ -4,8 +4,8 @@ let Badge;
 
 // An info-about-a-window object is called a "winfo". "Winfos" live here, acting as Winger's source-of-truth.
 export const winfoMap = {};
+
 export const defaultNameHead = 'Window ';
-export let windowCount = 0;
 let lastWindowNumber = 0;
 
 export const sortedWinfos = () => Object.values(winfoMap).sort(compareLastFocused);
@@ -20,7 +20,6 @@ export async function init(SETTINGS, windows) {
         const windowId = window.id;
         windowIds.push(windowId);
         winfoMap[windowId] = createWinfo(window);
-        windowCount++;
     }
     await nameWinfos(windowIds);
 }
@@ -29,13 +28,11 @@ export async function add(window) {
     const windowId = window.id;
     if (windowId in winfoMap) return;
     winfoMap[windowId] = createWinfo(window);
-    windowCount++;
     await nameWinfos([windowId]);
 }
 
 export function remove(windowId) {
     delete winfoMap[windowId];
-    windowCount--;
 }
 
 function createWinfo({ id, incognito }) {
@@ -101,4 +98,12 @@ export function hasName(name, excludeId) {
 function onWindowNamed(windowId) {
     Title.update(windowId);
     Badge?.update(windowId);
+}
+
+export function isOverOne() {
+    let count = 0;
+    for (const _ in infoMap) {
+        if (++count === 2) return true;
+    }
+    return false;
 }

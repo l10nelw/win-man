@@ -46,7 +46,7 @@ export function handleClick(info, tab) {
 
 // Update menu's enabled state based on window count.
 export function updateAvailability() {
-    const properties = { enabled: Window.windowCount > 1 };
+    const properties = { enabled: Window.isOverOne() };
     for (const context of enabledContexts) browser.menus.update(context, properties);
 }
 
