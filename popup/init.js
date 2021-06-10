@@ -12,12 +12,12 @@ export default () => browser.runtime.sendMessage({ popup: true })
 const $currentWindowList = document.getElementById('currentWindow');
 const getTemplateContent = id => document.getElementById(id).content.firstElementChild;
 
-function onSuccess({ SETTINGS, metaWindows, selectedTabCount }) {
+function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
     row.removeCells(SETTINGS);
     toolbar.removeButtons(SETTINGS);
     if (SETTINGS.enable_stash) commands.stash = requestStash;
 
-    populate(metaWindows);
+    populate(winfos);
     const $currentWindowRow = $currentWindowList.firstElementChild;
     const $otherWindowRows = [...$otherWindowsList.children];
     const $allWindowRows = [$currentWindowRow, ...$otherWindowRows];
@@ -60,11 +60,11 @@ function onError() {
     $toolbar.hidden = false;
 }
 
-function populate(metaWindows) {
-    const currentMetaWindow = metaWindows.shift();
-    $currentWindowList.appendChild(row.create(currentMetaWindow, true));
-    for (const metaWindow of metaWindows) {
-        $otherWindowsList.appendChild(row.create(metaWindow));
+function populate(winfos) {
+    const currentWinfo = winfos.shift();
+    $currentWindowList.appendChild(row.create(currentWinfo, true));
+    for (const winfo of winfos) {
+        $otherWindowsList.appendChild(row.create(winfo));
     }
 }
 

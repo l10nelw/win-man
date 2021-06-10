@@ -2,12 +2,12 @@ import * as Name from './name.js';
 import * as Title from './title.js';
 let Badge;
 
-export const windowMap = {};
+export const winfoMap = {};
 export const defaultNameHead = 'Window ';
 export let windowCount = 0;
 let lastWindowNumber = 0;
 
-export const sorted = () => Object.values(windowMap).sort(compareLastFocused);
+export const sorted = () => Object.values(winfoMap).sort(compareLastFocused);
 const compareLastFocused = (a, b) => b.lastFocused - a.lastFocused;
 
 export async function init(SETTINGS, windows) {
@@ -18,26 +18,26 @@ export async function init(SETTINGS, windows) {
     for (const window of windows) {
         const windowId = window.id;
         windowIds.push(windowId);
-        windowMap[windowId] = createMetaWindow(window);
+        winfoMap[windowId] = createWinfo(window);
         windowCount++;
     }
-    await nameMetaWindows(windowIds);
+    await nameWinfos(windowIds);
 }
 
 export async function add(window) {
     const windowId = window.id;
-    if (windowId in windowMap) return;
-    windowMap[windowId] = createMetaWindow(window);
+    if (windowId in winfoMap) return;
+    winfoMap[windowId] = createWinfo(window);
     windowCount++;
-    await nameMetaWindows([windowId]);
+    await nameWinfos([windowId]);
 }
 
 export function remove(windowId) {
-    delete windowMap[windowId];
+    delete winfoMap[windowId];
     windowCount--;
 }
 
-function createMetaWindow({ id, incognito }) {
+function createWinfo({ id, incognito }) {
     return {
         id,
         incognito,
@@ -46,17 +46,17 @@ function createMetaWindow({ id, incognito }) {
     };
 }
 
-async function nameMetaWindows(windowIds) {
+async function nameWinfos(windowIds) {
     await Promise.all(windowIds.map(restoreGivenName));
     for (const windowId of windowIds) {
-        windowMap[windowId].defaultName = createDefaultName(windowId);
+        winfoMap[windowId].defaultName = createDefaultName(windowId);
         onWindowNamed(windowId);
     }
 }
 
 async function restoreGivenName(windowId) {
     const givenName = await browser.sessions.getWindowValue(windowId, 'givenName');
-    windowMap[windowId].givenName = givenName ? Name.uniquify(givenName) : '';
+    winfoMap[windowId].givenName = givenName ? Name.uniquify(givenName) : '';
 }
 
 function createDefaultName(windowId) {
@@ -68,8 +68,8 @@ function createDefaultName(windowId) {
 }
 
 export function getName(windowId) {
-    const metaWindow = windowMap[windowId];
-    return metaWindow.givenName || metaWindow.defaultName;
+    const winfo = winfoMap[windowId];
+    return winfo.givenName || winfo.defaultName;
 }
 
 // Validate and store givenName for target window.
@@ -80,7 +80,7 @@ export function giveName(windowId, name) {
         const conflictId = hasName(name, windowId);
         if (conflictId) return conflictId;
     }
-    windowMap[windowId].givenName = name;
+    winfoMap[windowId].givenName = name;
     browser.sessions.setWindowValue(windowId, 'givenName', name);
     onWindowNamed(windowId);
     return 0;
@@ -89,10 +89,10 @@ export function giveName(windowId, name) {
 // Check if name conflicts with any windows, except with given excludeId.
 // Returns id of conflicting window, otherwise returns 0.
 export function hasName(name, excludeId) {
-    for (const id in windowMap) {
+    for (const id in winfoMap) {
         if (id == excludeId) continue;
-        const metaWindow = windowMap[id];
-        if (metaWindow.givenName === name || metaWindow.defaultName === name) return id;
+        const winfo = winfoMap[id];
+        if (winfo.givenName === name || winfo.defaultName === name) return id;
     }
     return 0;
 }

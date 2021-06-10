@@ -1,5 +1,5 @@
 import { BRING } from '../modifier.js';
-import * as Metadata from './metadata.js';
+import * as Window from './window.js';
 import * as Action from './action.js';
 
 const enabledContexts = [];
@@ -46,18 +46,18 @@ export function handleClick(info, tab) {
 
 // Update menu's enabled state based on window count.
 export function updateAvailability() {
-    const properties = { enabled: Metadata.windowCount > 1 };
+    const properties = { enabled: Window.windowCount > 1 };
     for (const context of enabledContexts) browser.menus.update(context, properties);
 }
 
 // Clear and populate `context` menu with other-window menu items, sorted by lastFocsued.
 function populate(context, currentWindowId) {
     const properties = { contexts: [context], parentId: context };
-    for (const { id: windowId } of Metadata.sorted()) {
+    for (const { id: windowId } of Window.sorted()) {
         const id = menuId(context, windowId);
         browser.menus.remove(id);
         if (windowId === currentWindowId) continue;
-        browser.menus.create({ ...properties, id, title: Metadata.getName(windowId) });
+        browser.menus.create({ ...properties, id, title: Window.getName(windowId) });
     }
     browser.menus.remove(menuId(context)); // Remove dummy if it exists
     browser.menus.refresh();

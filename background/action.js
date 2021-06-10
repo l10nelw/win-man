@@ -1,5 +1,5 @@
 import { BRING, SEND } from '../modifier.js';
-import { windowMap } from './metadata.js';
+import { winfoMap } from './window.js';
 import { SETTINGS } from './settings.js';
 
 export const openHelp = hash => openUniqueExtensionPage('help/help.html', hash);
@@ -132,7 +132,7 @@ const unpinTab  = tabId => browser.tabs.update(tabId, { pinned: false });
 const pinTab    = tabId => browser.tabs.update(tabId, { pinned: true });
 const focusTab  = tabId => browser.tabs.update(tabId, { active: true });
 const selectTab = tabId => browser.tabs.update(tabId, { active: false, highlighted: true });
-const isSamePrivateStatus = (windowId1, windowId2) => windowMap[windowId1].incognito === windowMap[windowId2].incognito;
+const isSamePrivateStatus = (windowId1, windowId2) => winfoMap[windowId1].incognito === winfoMap[windowId2].incognito;
 
 const READER_HEAD = 'about:reader?url=';
 const isReader = url => url.startsWith(READER_HEAD);

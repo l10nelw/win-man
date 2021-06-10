@@ -1,10 +1,5 @@
-/*
-- Data created and used by this webextension pertaining to a window are 'metadata' and an object collecting them is a
-  'metawindow'. The metawindows live in Metadata.windowMap as the webextension's source-of-truth.
-*/
-
 import * as Settings from './settings.js';
-import * as Metadata from './metadata.js';
+import * as Window from './window.js';
 import * as Action from './action.js';
 let Stash, Menu; // Optional modules
 
@@ -26,7 +21,7 @@ async function init() {
         Stash.init(SETTINGS);
     }
 
-    await Metadata.init(SETTINGS, windows);
+    await Window.init(SETTINGS, windows);
     for (const window of windows) onWindowCreated(window, true);
 
     const menusEnabled = [];
@@ -38,7 +33,7 @@ async function init() {
         Menu.init(menusEnabled);
     }
 
-    // Object.assign(window, { Metadata, Action, Stash });
+    // Object.assign(window, { Window, Action, Stash });
 }
 
 function onExtInstalled(details) {
@@ -51,23 +46,23 @@ async function onWindowCreated(window, isInit) {
 
     if (isInit) return;
 
-    await Metadata.add(window);
+    await Window.add(window);
     Menu?.update();
     Stash?.unstash.onWindowCreated(windowId);
     Action.selectFocusedTab(windowId);
 }
 
 function onWindowRemoved(windowId) {
-    Metadata.remove(windowId);
+    Window.remove(windowId);
     Menu?.update();
 }
 
 function onWindowFocused(windowId) {
     if (isWindowBeingCreated(windowId)) return;
-    Metadata.windowMap[windowId].lastFocused = Date.now();
+    Window.winfoMap[windowId].lastFocused = Date.now();
 }
 
-const isWindowBeingCreated = windowId => !(windowId in Metadata.windowMap);
+const isWindowBeingCreated = windowId => !(windowId in Window.winfoMap);
 
 async function onRequest(request) {
 
@@ -76,7 +71,7 @@ async function onRequest(request) {
     if (request.popup) {
         return {
             SETTINGS:         Settings.SETTINGS,
-            metaWindows:      Metadata.sorted(),
+            winfos:            Window.sorted(),
             selectedTabCount: (await Action.getSelectedTabs()).length,
         };
     }
@@ -87,10 +82,10 @@ async function onRequest(request) {
     if (request.help) return Action.openHelp();
 
     // From popup/editmode.js
-    if (request.giveName) return Metadata.giveName(request.windowId, request.name);
+    if (request.giveName) return Window.giveName(request.windowId, request.name);
 }
 
 function debug() {
-    Object.assign(window, { Metadata });
-    console.log(Metadata.windowMap);
+    Object.assign(window, { Window });
+    console.log(Window.winfoMap);
 }

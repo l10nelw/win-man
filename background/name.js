@@ -1,4 +1,4 @@
-import { hasName } from './metadata.js';
+import { hasName } from './window.js';
 
 // const defaultPattern = /^Window \d+$/;
 const numberPostfix = / (\d+)$/;
