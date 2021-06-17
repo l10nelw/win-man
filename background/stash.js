@@ -1,6 +1,5 @@
 import * as Name from './name.js';
-import * as WindowTab from './windowtab.js';
-import * as Metadata from './metadata.js';
+import * as Action from './action.js';
 import { SETTINGS } from './settings.js';
 
 let HOME_ID;
@@ -69,7 +68,7 @@ const getHomeContents = async () => (await browser.bookmarks.getSubTree(HOME_ID)
 // Turn window/tabs into folder/bookmarks.
 // Create folder if nonexistent, save tabs as bookmarks in folder, and close window.
 export async function stash(windowId) {
-    const name = Metadata.getName(windowId);
+    const name = Name.get(windowId);
     const tabs = await browser.tabs.query({ windowId });
     closeWindow(windowId);
     const folderId = (await getTargetFolder(name)).id;
@@ -104,7 +103,7 @@ async function saveTabs(tabs, folderId) {
     const savingBookmarks = new Array(count);
     for (let i = count; i--;) { // Reverse iteration necessary for bookmarks to be in correct order
         const tab = tabs[i];
-        properties.url = WindowTab.deplaceholderize(tab.url);
+        properties.url = Action.deplaceholderize(tab.url);
         properties.title = tab.title;
         savingBookmarks[i] = createNode(properties);
     }
@@ -116,6 +115,7 @@ async function saveTabs(tabs, folderId) {
 
 // Turn folder/bookmarks into window/tabs.
 // If folder, create and populate window. Bookmarks and empty folder are removed.
+// If single bookmark, open in current window and remove.
 export async function unstash(nodeId) {
     const node = (await browser.bookmarks.get(nodeId))[0];
     switch (node.type) {
@@ -146,7 +146,7 @@ unstash.onWindowCreated = async windowId => {
     delete unstash.info;
 
     const name = Name.uniquify(Name.validify(info.name), windowId);
-    Metadata.giveName(windowId, name);
+    Name.set(windowId, name);
 
     const folderId = info.folderId;
     nowUnstashing.add(folderId);
@@ -184,7 +184,7 @@ async function replaceInitTab({ windowId, initTabId }, bookmark, active) {
     browser.tabs.remove(initTabId);
 }
 
-const openTab = ({ url, title }, windowId, active) => WindowTab.openTab({ discarded: true, url, title, windowId, active });
+const openTab = ({ url, title }, windowId, active) => Action.openTab({ discarded: true, url, title, windowId, active });
 
 
 /* --- */

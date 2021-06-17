@@ -12,7 +12,7 @@ export async function init(contexts) {
         switch (context) {
             case 'bookmark':
                 addMenuItem(context, false); // Starts disabled
-                UnstashMenu = await import('./menu.unstash.js');
+                import('./menu.unstash.js').then(module => UnstashMenu = module);
                 break;
             case 'tab':
             case 'link':

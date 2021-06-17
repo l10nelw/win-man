@@ -3,7 +3,7 @@ import { $otherWindowsList, $toolbar, unsetActionAttr, requestStash } from './po
 import { $omnibox, commands } from './omnibox.js';
 import * as Status from './status.js';
 import * as Tooltip from './tooltip.js';
-import * as Modifier from '../modifier.js';
+import { BRING, SEND } from '../modifier.js';
 
 export default () => browser.runtime.sendMessage({ popup: true })
     .then(onSuccess)
@@ -12,12 +12,12 @@ export default () => browser.runtime.sendMessage({ popup: true })
 const $currentWindowList = document.getElementById('currentWindow');
 const getTemplateContent = id => document.getElementById(id).content.firstElementChild;
 
-function onSuccess({ SETTINGS, metaWindows, selectedTabCount }) {
+function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
     row.removeCells(SETTINGS);
     toolbar.removeButtons(SETTINGS);
     if (SETTINGS.enable_stash) commands.stash = requestStash;
 
-    populate(metaWindows);
+    populate(winfos);
     const $currentWindowRow = $currentWindowList.firstElementChild;
     const $otherWindowRows = [...$otherWindowsList.children];
     const $allWindowRows = [$currentWindowRow, ...$otherWindowRows];
@@ -60,11 +60,11 @@ function onError() {
     $toolbar.hidden = false;
 }
 
-function populate(metaWindows) {
-    const currentMetaWindow = metaWindows.shift();
-    $currentWindowList.appendChild(row.create(currentMetaWindow, true));
-    for (const metaWindow of metaWindows) {
-        $otherWindowsList.appendChild(row.create(metaWindow));
+function populate(winfos) {
+    const currentWinfo = winfos.shift();
+    $currentWindowList.appendChild(row.create(currentWinfo, true));
+    for (const winfo of winfos) {
+        $otherWindowsList.appendChild(row.create(winfo));
     }
 }
 
@@ -139,7 +139,6 @@ const toolbar = {
 }
 
 function createModifierHints(selectedTabCount) {
-    const { BRING, SEND } = Modifier;
     const tabWord = selectedTabCount === 1 ? 'tab' : 'tabs';
     return {
         [BRING]: `${BRING.toUpperCase()}: Bring ${tabWord} to...`,

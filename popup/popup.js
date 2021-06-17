@@ -1,13 +1,13 @@
 /*
 - A window is represented in the popup as a 'row', which is represented by an HTML list item (<li>).
-- All relevant data are embedded and managed within the popup's DOM structure. No separate, representative dataset to
-  be maintained in parallel with the DOM (apart from Metadata in the background).
+- All relevant data are embedded and managed within the popup DOM; there are no representative objects maintained
+  in parallel, apart from Window.infoMap in the background.
 - A variable prefixed with '$' references a DOM node or a collection of DOM nodes.
 - Some DOM nodes have custom properties (expandos) prefixed with '_' or '$', to store and pass around data.
 */
 
 import { isInput, hasClass } from '../utils.js';
-import * as Modifier from '../modifier.js';
+import { get as getModifiers } from '../modifier.js';
 import * as Omnibox from './omnibox.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
@@ -130,7 +130,7 @@ export function requestAction(event, $action = event.target) {
         action,
         windowId,
         originWindowId: $currentWindowRow._id,
-        modifiers: Modifier.get(event),
+        modifiers: getModifiers(event),
     });
     window.close();
 }

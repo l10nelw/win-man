@@ -1,17 +1,10 @@
-import { defaultNameHead, windowMap } from './metadata.js';
+import { get as getName } from './name.js';
 
-// [bgColor, textColor]
-const unnamedWindowColors = ['black', 'white'];
-const namedWindowColors   = ['white', 'black'];
+const bgColor = 'white';
+const textColor = 'black';
 
 export function update(windowId) {
-    const metaWindow = windowMap[windowId];
-    const name = metaWindow.givenName;
-    const [bgColor, textColor, text] = name && [...namedWindowColors, name] || [...unnamedWindowColors, defaultText(metaWindow)];
     browser.browserAction.setBadgeBackgroundColor({ windowId, color: bgColor });
     browser.browserAction.setBadgeTextColor({ windowId, color: textColor });
-    browser.browserAction.setBadgeText({ windowId, text });
+    browser.browserAction.setBadgeText({ windowId, text: getName(windowId) });
 }
-
-const defaultTextIndex = defaultNameHead.length;
-const defaultText = metaWindow => '#' + metaWindow.defaultName.slice(defaultTextIndex);

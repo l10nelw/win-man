@@ -1,26 +1,72 @@
-import { hasName } from './metadata.js';
+import { infoMap as WinfoMap } from './window.js';
+import { propagate } from './name.propagate.js';
+export { init } from './name.propagate.js';
 
-// const defaultPattern = /^Window \d+$/;
-const numberPostfix = / (\d+)$/;
+const DEFAULT_HEAD = '#';
+const NUMBER_POSTFIX = / (\d+)$/;
 
-export function isInvalid(str) {
-    return str.startsWith('/');
+// Restore window's givenName, else if unsuccessful, give it a default one.
+export async function tryRestore(windowId) {
+    const givenName = await browser.sessions.getWindowValue(windowId, 'givenName');
+    WinfoMap[windowId].givenName = givenName ? uniquify(givenName) : createDefault();
+    propagate(windowId);
 }
 
-// Remove spaces and illegal characters from str.
-export function validify(str) {
-    str = str.trim();
-    return str.startsWith('/') ? validify(str.slice(1)) : str;
+export function get(windowId) {
+    return WinfoMap[windowId].givenName;
 }
 
-// If window name str is not unique, add number postfix to it.
-// Supply excludeId to skip a particular window to check against.
-export function uniquify(str, excludeId) {
-    return hasName(str, excludeId) ? uniquify(applyNumberPostfix(str)) : str;
+// Validate and store name for target window. Return 0 if successful, otherwise return -1 or id of conflicting window.
+// If name is blank, create and store a default one.
+export function set(windowId, name) {
+    if (name) {
+        if (isInvalid(name)) return -1;
+        const conflictId = has(name, windowId);
+        if (conflictId) return conflictId;
+    }
+    else name = createDefault();
+    WinfoMap[windowId].givenName = name;
+    browser.sessions.setWindowValue(windowId, 'givenName', name);
+    propagate(windowId);
+    return 0;
 }
 
-// Add " 2" at the end of str, or increment an existing " number".
-export function applyNumberPostfix(str) {
-    const found = str.match(numberPostfix);
-    return found ? `${str.slice(0, found.index)} ${Number(found[1]) + 1}` : `${str} 2`;
+function createDefault() {
+    let name;
+    let number = 0;
+    do {
+        name = `${DEFAULT_HEAD}${++number}`;
+    } while (has(name));
+    return name;
+}
+
+function isInvalid(name) {
+    return name.startsWith('/');
+}
+
+// Remove spaces and illegal characters from name.
+export function validify(name) {
+    name = name.trim();
+    return name.startsWith('/') ? validify(name.slice(1)) : name;
+}
+
+// If name is not unique, add number postfix to it.
+// Check against all windows except window of excludeId.
+export function uniquify(name, excludeId) {
+    return has(name, excludeId) ? uniquify(applyNumberPostfix(name)) : name;
+}
+
+// Find window with given name, skipping window with id of excludeId. Return id of matching window, otherwise return 0.
+export function has(name, excludeId) {
+    for (const id in WinfoMap) {
+        if (id == excludeId) continue;
+        if (WinfoMap[id].givenName === name) return id;
+    }
+    return 0;
+}
+
+// Add " 2" at the end of name, or increment an existing number postfix.
+function applyNumberPostfix(name) {
+    const found = name.match(NUMBER_POSTFIX);
+    return found ? `${name.slice(0, found.index)} ${Number(found[1]) + 1}` : `${name} 2`;
 }
