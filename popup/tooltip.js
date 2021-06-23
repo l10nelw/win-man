@@ -1,5 +1,4 @@
-import { hasClass } from '../utils.js';
-import * as Popup from './popup.js';
+import { getName, getActionElements, hasClass } from './common.js';
 
 const colon = ': ';
 
@@ -9,7 +8,7 @@ export function init(tabCount) {
     function memoisedRowName($row) {
         let name = rowNames.get($row);
         if (!name) {
-            name = Popup.getName($row);
+            name = getName($row);
             rowNames.set($row, name);
         }
         return name;
@@ -18,7 +17,7 @@ export function init(tabCount) {
     const tabCountPhrase = tabCount == 1 ? 'tab' : `${tabCount} tabs`;
     const reopenPhrase = $row => hasClass('reopenTabs', $row) ? '(reopen) ' : '';
 
-    for (const $action of Popup.getActionElements()) {
+    for (const $action of getActionElements()) {
         const $row = $action.$row || $action;
         const name = memoisedRowName($row);
         const insertText = reopenPhrase($row) + tabCountPhrase;

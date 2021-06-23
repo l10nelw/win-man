@@ -1,7 +1,7 @@
-import { $currentWindowRow, $otherWindowsList, $otherWindowRows, getName, requestAction } from './popup.js';
+import { $currentWindowRow, $otherWindowsList, $otherWindowRows,
+    getName, requestAction, getScrollbarWidth, hasClass, addClass, removeClass, toggleClass } from './common.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
-import { getScrollbarWidth, hasClass, addClass, removeClass, toggleClass } from '../utils.js';
 
 export const $omnibox = document.getElementById('omnibox');
 

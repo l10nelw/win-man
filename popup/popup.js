@@ -6,41 +6,26 @@
 - Some DOM nodes have custom properties (expandos) prefixed with '_' or '$', to store and pass around data.
 */
 
-import { isInput, hasClass } from '../utils.js';
-import { get as getModifiers } from '../modifier.js';
+import { $body, $currentWindowRow, requestAction, isRow, isInput, hasClass } from './common.js';
 import * as Omnibox from './omnibox.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
 import navigateByArrow from './navigation.js';
 
-export const $body = document.body;
-export const $otherWindowsList = document.getElementById('otherWindows');
-export const $toolbar = $body.querySelector('footer');
-const $omnibox = Omnibox.$omnibox;
-
-export const isRow = $el => $el?._id;
+const { $omnibox } = Omnibox;
 const isClickKey = key => key === 'Enter' || key === ' ';
 
-// Action attribute utilities
-const actionAttr = 'data-action';
-export const getActionAttr = $el => $el?.getAttribute(actionAttr);
-export const unsetActionAttr = $el => $el?.removeAttribute(actionAttr);
-export const getActionElements = ($scope = $body, suffix = '') => $scope.querySelectorAll(`[${actionAttr}]${suffix}`);
-
-// Populated by init()
-export let $currentWindowRow, $otherWindowRows, $allWindowRows;
 let modifierHints;
 
-(async () => {
-    const { default: init } = await import('./init.js');
-    ({ $currentWindowRow, $otherWindowRows, $allWindowRows, modifierHints } = await init());
+import('./init.js').then(async init => {
+    ({ modifierHints } = await init.default());
     $body.addEventListener('click', onClick);
     $body.addEventListener('contextmenu', onRightClick);
     $body.addEventListener('keydown', onKeyDown);
     $body.addEventListener('keyup', onKeyUp);
     $body.addEventListener('focusout', onFocusOut);
     $currentWindowRow.$input.addEventListener('dblclick', onDoubleClick);
-})();
+});
 
 function onClick(event) {
     const { target: $target } = event;
@@ -106,31 +91,4 @@ function showModifierHint(key) {
     const hint = modifierHints[key];
     Omnibox.placeholder(hint);
     return hint;
-}
-
-// Given a $row or any of its child elements, get the givenName or defaultName.
-export function getName($rowElement) {
-    const $input = hasClass('input', $rowElement) && $rowElement || $rowElement.$input || $rowElement.$row.$input;
-    return $input.value || $input.placeholder;
-}
-
-export function requestStash(windowId = $currentWindowRow._id) {
-    browser.runtime.sendMessage({ stash: windowId });
-}
-
-// Gather action parameters from event and $action element. If action and windowId found, send parameters to
-// background to request action execution.
-export function requestAction(event, $action = event.target) {
-    const $row = $action.$row || $action;
-    const windowId = $row._id;
-    if (!windowId) return;
-    const action = getActionAttr($action) || getActionAttr($row);
-    if (!action) return;
-    browser.runtime.sendMessage({
-        action,
-        windowId,
-        originWindowId: $currentWindowRow._id,
-        modifiers: getModifiers(event),
-    });
-    window.close();
 }
