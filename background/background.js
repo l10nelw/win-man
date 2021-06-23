@@ -7,7 +7,8 @@ import * as Settings from './settings.js';
 import * as Window from './window.js';
 import * as Name from './name.js';
 import * as Action from './action.js';
-let Stash, Menu; // Optional modules
+import * as Title from './title.js';
+let Badge, Stash, Menu; // Optional modules
 
 function debug() {
     Object.assign(window, { Window, Name, Action, Stash, Menu, Settings });
@@ -27,7 +28,12 @@ async function init() {
     const [SETTINGS, windows] = await Promise.all([ Settings.retrieve(), browser.windows.getAll() ]);
 
     Action.init(SETTINGS);
-    Name.init(SETTINGS);
+
+    if (SETTINGS.show_badge) {
+        import('./badge.js').then(module => {
+            Badge = module;
+        });
+    }
 
     if (SETTINGS.enable_stash) {
         import('./stash.js').then(module => {
@@ -99,4 +105,7 @@ async function onRequest(request) {
     if (request.giveName) return Name.set(request.windowId, request.name);
 }
 
+export function onWindowNamed(windowId, name) {
+    Title.update(windowId, name);
+    Badge?.update(windowId, name);
 }

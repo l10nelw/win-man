@@ -1,15 +1,15 @@
 import { infoMap as WinfoMap } from './window.js';
-import { propagate } from './name.propagate.js';
-export { init } from './name.propagate.js';
+import { onWindowNamed } from './background.js';
 
 const DEFAULT_HEAD = '#';
 const NUMBER_POSTFIX = / (\d+)$/;
 
 // Restore window's givenName, else if unsuccessful, give it a default one.
 export async function tryRestore(windowId) {
-    const givenName = await browser.sessions.getWindowValue(windowId, 'givenName');
-    WinfoMap[windowId].givenName = givenName ? uniquify(givenName) : createDefault();
-    propagate(windowId);
+    let name = await browser.sessions.getWindowValue(windowId, 'givenName');
+    name = name ? uniquify(name) : createDefault();
+    WinfoMap[windowId].givenName = name;
+    onWindowNamed(windowId, name);
 }
 
 export function get(windowId) {
@@ -27,7 +27,7 @@ export function set(windowId, name) {
     else name = createDefault();
     WinfoMap[windowId].givenName = name;
     browser.sessions.setWindowValue(windowId, 'givenName', name);
-    propagate(windowId);
+    onWindowNamed(windowId, name);
     return 0;
 }
 

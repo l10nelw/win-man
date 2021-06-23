@@ -1,8 +1,7 @@
-import { get as getName } from './name.js';
 import { getShortcut } from '../utils.js';
 
-export async function update(windowId) {
-    const titlePreface = `${getName(windowId)} - `;
+export async function update(windowId, name) {
+    const titlePreface = `${name} - `;
 
     // Titlebar
     browser.windows.update(windowId, { titlePreface });
