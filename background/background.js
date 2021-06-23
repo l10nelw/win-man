@@ -28,20 +28,17 @@ async function init() {
     const [SETTINGS, windows] = await Promise.all([ Settings.retrieve(), browser.windows.getAll() ]);
 
     Action.init(SETTINGS);
-
     if (SETTINGS.show_badge) {
         import('./badge.js').then(module => {
             Badge = module;
         });
     }
-
     if (SETTINGS.enable_stash) {
         import('./stash.js').then(module => {
             Stash = module;
             Stash.init(SETTINGS);
         });
     }
-
     const menusEnabled = [];
     if (SETTINGS.enable_tab_menu)  menusEnabled.push('tab');
     if (SETTINGS.enable_link_menu) menusEnabled.push('link');
