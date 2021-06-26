@@ -1,5 +1,6 @@
-import { $currentWindowRow, $otherWindowsList, $otherWindowRows,
-    getName, requestAction, getScrollbarWidth, hasClass, addClass, removeClass, toggleClass } from './common.js';
+import { hasClass, addClass, removeClass, toggleClass } from '../utils.js';
+import { $currentWindowRow, $otherWindowsList, $otherWindowRows, getName, getScrollbarWidth } from './common.js';
+import * as Request from './request.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
 
@@ -22,7 +23,7 @@ export function handleKeyUp(key, event) {
 
     showFilteredRows(str);
     const $firstRow = [...$otherWindowsList.children].find($row => !$row.hidden);
-    if (enter && $firstRow) requestAction(event, $firstRow);
+    if (enter && $firstRow) Request.action(event, $firstRow);
 }
 
 function handleSlashed(key, event, str, enter) {
@@ -32,6 +33,10 @@ function handleSlashed(key, event, str, enter) {
     }
     if (enter) {
         clear();
+        if (str === '/debug') {
+            placeholder('Debug mode on in console');
+            return Request.debug();
+        }
         if (command) commands[command]();
     }
 }

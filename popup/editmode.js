@@ -3,8 +3,8 @@ Edit Mode is activated at two levels, general and row (specific).
 General activation governs state that persists while different rows change active status.
 */
 
-import { $body, $currentWindowRow, $allWindowRows,
-    getActionElements, getName, hasClass, toggleClass } from './common.js';
+import { hasClass, toggleClass } from '../utils.js';
+import { $body, $currentWindowRow, $allWindowRows, getActionElements, getName } from './common.js';
 import * as Omnibox from './omnibox.js';
 import * as Tooltip from './tooltip.js';
 import * as Status from './status.js';

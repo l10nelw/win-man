@@ -1,5 +1,6 @@
-import { init as initCommon, $otherWindowsList, $toolbar,
-    getScrollbarWidth, requestStash, unsetActionAttr, hasClass, addClass, toggleClass } from './common.js';
+import { hasClass, addClass, toggleClass } from '../utils.js';
+import { init as initCommon, $otherWindowsList, $toolbar, getScrollbarWidth, unsetActionAttr } from './common.js';
+import * as Request from './request.js';
 import { $omnibox, commands } from './omnibox.js';
 import * as Status from './status.js';
 import * as Tooltip from './tooltip.js';
@@ -15,7 +16,7 @@ const getTemplateContent = id => document.getElementById(id).content.firstElemen
 function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
     row.removeCells(SETTINGS);
     toolbar.removeButtons(SETTINGS);
-    if (SETTINGS.enable_stash) commands.stash = requestStash;
+    if (SETTINGS.enable_stash) commands.stash = Request.stash;
 
     populate(winfos);
     const $currentWindowRow = $currentWindowList.firstElementChild;
@@ -41,19 +42,17 @@ function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
 }
 
 function onError() {
-    browser.runtime.sendMessage({ popupError: true });
-
+    Request.debug();
     browser.browserAction.setBadgeText({ text: '⚠️' });
     browser.browserAction.setBadgeBackgroundColor({ color: 'transparent' });
-
-    Status.show('⚠️ Winger needs to be restarted.');
-    expandBodyWidth(1);
 
     const $restartBtn = getTemplateContent('restartTemplate');
     $restartBtn.onclick = () => browser.runtime.reload();
     $toolbar.innerHTML = '';
     $toolbar.appendChild($restartBtn);
     $toolbar.hidden = false;
+    expandBodyWidth(1);
+    Status.show('⚠️ Winger needs to be restarted.');
 }
 
 function populate(winfos) {

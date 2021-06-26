@@ -1,4 +1,5 @@
-import { getName, getActionElements, hasClass } from './common.js';
+import { hasClass } from '../utils.js';
+import { getName, getActionElements } from './common.js';
 
 const colon = ': ';
 

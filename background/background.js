@@ -84,7 +84,6 @@ const isWindowBeingCreated = windowId => !(windowId in Window.infoMap);
 async function onRequest(request) {
 
     // From popup/init.js
-    if (request.popupError) return debug();
     if (request.popup) {
         return {
             SETTINGS:         Settings.SETTINGS,
@@ -100,6 +99,8 @@ async function onRequest(request) {
 
     // From popup/editmode.js
     if (request.giveName) return Name.set(request.windowId, request.name);
+
+    if (request.debug) return debug();
 }
 
 export function onWindowNamed(windowId, name) {

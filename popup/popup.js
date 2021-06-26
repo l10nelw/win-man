@@ -6,7 +6,9 @@
 - Some DOM nodes have custom properties (expandos) prefixed with '_' or '$', to store and pass around data.
 */
 
-import { $body, $currentWindowRow, requestAction, isRow, isInput, hasClass } from './common.js';
+import { hasClass } from '../utils.js';
+import { $body, $currentWindowRow, isRow, isInput } from './common.js';
+import { action as requestAction } from './request.js';
 import * as Omnibox from './omnibox.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';

@@ -1,4 +1,4 @@
-import { addClass, toggleClass } from './common.js';
+import { addClass, toggleClass } from '../utils.js';
 
 const $status = document.getElementById('status');
 const count = { tabs: 0, windows: 0 };
