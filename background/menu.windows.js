@@ -1,4 +1,5 @@
 import { BRING } from '../modifier.js';
+import { get as getName } from './name.js';
 import * as Window from './window.js';
 import * as Action from './action.js';
 
@@ -57,7 +58,7 @@ function populate(context, currentWindowId) {
         const id = menuId(context, windowId);
         browser.menus.remove(id);
         if (windowId === currentWindowId) continue;
-        browser.menus.create({ ...properties, id, title: Window.getName(windowId) });
+        browser.menus.create({ ...properties, id, title: getName(windowId) });
     }
     browser.menus.remove(menuId(context)); // Remove dummy if it exists
     browser.menus.refresh();

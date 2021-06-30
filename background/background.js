@@ -1,5 +1,6 @@
 import * as Settings from './settings.js';
 import * as Window from './window.js';
+import { set as setName } from './name.js';
 import * as Action from './action.js';
 import * as Title from './title.js';
 let Badge, Stash, Menu; // Optional modules
@@ -89,7 +90,7 @@ async function onRequest(request) {
     if (request.help) return Action.openHelp();
 
     // From popup/editmode.js
-    if (request.giveName) return Window.giveName(request.windowId, request.name);
+    if (request.giveName) return setName(request.windowId, request.name);
 }
 
 export function onWindowNamed(windowId) {

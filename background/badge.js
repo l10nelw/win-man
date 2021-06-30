@@ -1,4 +1,5 @@
-import { defaultNameHead, winfoMap } from './window.js';
+import { winfoMap } from './window.js';
+import { DEFAULT_HEAD } from './name.js';
 
 // [bgColor, textColor]
 const unnamedWindowColors = ['black', 'white'];
@@ -13,5 +14,5 @@ export function update(windowId) {
     browser.browserAction.setBadgeText({ windowId, text });
 }
 
-const defaultTextIndex = defaultNameHead.length;
+const defaultTextIndex = DEFAULT_HEAD.length;
 const defaultText = winfo => '#' + winfo.defaultName.slice(defaultTextIndex);

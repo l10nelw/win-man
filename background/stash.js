@@ -67,7 +67,7 @@ const getHomeContents = async () => (await browser.bookmarks.getSubTree(HOME_ID)
 // Turn window/tabs into folder/bookmarks.
 // Create folder if nonexistent, save tabs as bookmarks in folder, and close window.
 export async function stash(windowId) {
-    const name = Window.getName(windowId);
+    const name = Name.get(windowId);
     const tabs = await browser.tabs.query({ windowId });
     closeWindow(windowId);
     const folderId = (await getTargetFolder(name)).id;
@@ -147,7 +147,7 @@ unstash.onWindowCreated = async windowId => {
     delete unstash.info;
 
     const name = Name.uniquify(Name.validify(info.name), windowId);
-    Window.giveName(windowId, name);
+    Name.set(windowId, name);
 
     const folderId = info.folderId;
     nowUnstashing.add(folderId);
