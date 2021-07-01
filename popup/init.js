@@ -1,5 +1,5 @@
-import { getScrollbarWidth, hasClass, addClass, toggleClass } from '../utils.js';
-import { $otherWindowsList, $toolbar, unsetActionAttr, requestStash } from './popup.js';
+import { hasClass, addClass, toggleClass } from '../utils.js';
+import { init as initCommon, $otherWindowsList, $toolbar, getScrollbarWidth, requestStash, unsetActionAttr } from './common.js';
 import { $omnibox, commands } from './omnibox.js';
 import * as Status from './status.js';
 import * as Tooltip from './tooltip.js';
@@ -21,7 +21,7 @@ function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
     const $currentWindowRow = $currentWindowList.firstElementChild;
     const $otherWindowRows = [...$otherWindowsList.children];
     const $allWindowRows = [$currentWindowRow, ...$otherWindowRows];
-    const modifierHints = createModifierHints(selectedTabCount);
+    initCommon({ $currentWindowRow, $otherWindowRows, $allWindowRows });
 
     Status.init($allWindowRows);
     Tooltip.init(selectedTabCount);
@@ -36,12 +36,8 @@ function onSuccess({ SETTINGS, winfos, selectedTabCount }) {
     alignWithScrollbar($currentWindowRow, $otherWindowsList);
     lockHeight($otherWindowsList);
 
-    return {
-        $currentWindowRow,
-        $otherWindowRows,
-        $allWindowRows,
-        modifierHints,
-    };
+    const modifierHints = createModifierHints(selectedTabCount);
+    return { modifierHints };
 }
 
 function onError() {

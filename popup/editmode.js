@@ -4,7 +4,7 @@ General activation governs state that persists while different rows change activ
 */
 
 import { hasClass, toggleClass } from '../utils.js';
-import * as Popup from './popup.js';
+import { $body, $currentWindowRow, $allWindowRows, getActionElements, getName } from './common.js';
 import * as Omnibox from './omnibox.js';
 import * as Tooltip from './tooltip.js';
 import * as Status from './status.js';
@@ -31,7 +31,7 @@ export function handleClick($target) {
     }
 }
 
-export function activate($row = Popup.$currentWindowRow) {
+export function activate($row = $currentWindowRow) {
     $active ? row.deactivate() : general.activate();
     row.activate($row);
 }
@@ -46,7 +46,7 @@ async function done() {
 const general = {
     toggle(yes) {
         const tabIndex = yes ? -1 : 0;
-        $disabledActions = $disabledActions || [...Popup.getActionElements(Popup.$body, ':not(.edit)')];
+        $disabledActions = $disabledActions || [...getActionElements($body, ':not(.edit)')];
         $disabledActions.forEach($action => $action.tabIndex = tabIndex);
         document.body.dataset.mode = yes ? 'edit' : '';
         Omnibox.disable(yes);
@@ -84,13 +84,13 @@ const row = {
     },
     deactivate() {
         $activeInput.setSelectionRange(0, 0); // Ensures the beginning is visible in case of a very long name
-        const name = Popup.getName($activeInput);
-        const $actions = [$active, ...Popup.getActionElements($active)];
+        const name = getName($activeInput);
+        const $actions = [$active, ...getActionElements($active)];
         $actions.forEach($action => $action.title = Tooltip.updateName($action.title, name));
         this.toggle(false);
     },
     shiftActive(down) {
-        const $rows = Popup.$allWindowRows;
+        const $rows = $allWindowRows;
         const thisIndex = $rows.indexOf($active);
         if (thisIndex === -1) return;
         const lastIndex = $rows.length - 1;
