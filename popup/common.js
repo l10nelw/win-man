@@ -1,5 +1,4 @@
 import { hasClass } from '../utils.js';
-import { get as getModifiers } from '../modifier.js';
 
 // Elements of the popup
 export const $body = document.body;
@@ -26,27 +25,6 @@ export const getActionElements = ($scope = $body, suffix = '') => $scope.querySe
 export function getName($rowElement) {
     const $input = hasClass('input', $rowElement) && $rowElement || $rowElement.$input || $rowElement.$row.$input;
     return $input.value || $input.placeholder;
-}
-
-// Gather action parameters from event and $action element. If action and windowId found, send parameters to
-// background to request action execution.
-export function requestAction(event, $action = event.target) {
-    const $row = $action.$row || $action;
-    const windowId = $row._id;
-    if (!windowId) return;
-    const action = getActionAttr($action) || getActionAttr($row);
-    if (!action) return;
-    browser.runtime.sendMessage({
-        action,
-        windowId,
-        originWindowId: $currentWindowRow._id,
-        modifiers: getModifiers(event),
-    });
-    window.close();
-}
-
-export function requestStash(windowId = $currentWindowRow._id) {
-    browser.runtime.sendMessage({ stash: windowId });
 }
 
 export const getScrollbarWidth = $el => $el.offsetWidth - $el.clientWidth;

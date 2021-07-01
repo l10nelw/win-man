@@ -8,6 +8,7 @@ import { $body, $currentWindowRow, $allWindowRows, getActionElements, getName } 
 import * as Omnibox from './omnibox.js';
 import * as Tooltip from './tooltip.js';
 import * as Status from './status.js';
+import * as Request from './request.js';
 
 export let $active = null; // Currently activated row; indicates if popup is in Edit Mode
 let $activeInput;
@@ -146,10 +147,11 @@ export function handleKeyUp(key, $target) {
 // Trim content of input and try to save it. Return 0 on success, non-zero on failure.
 // Toggles error indicator accordingly.
 async function trySaveName($input) {
-    const name = $input.value = $input.value.trim();
     let error = 0;
+    const name = $input.value = $input.value.trim();
     if (name !== $input._original) {
-        error = await browser.runtime.sendMessage({ giveName: true, windowId: $input.$row._id, name });
+        const windowId = $input.$row._id;
+        error = await Request.setName(windowId, name);
     }
     toggleError($input, error);
     return error;

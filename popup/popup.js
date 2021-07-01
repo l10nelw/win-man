@@ -1,8 +1,9 @@
 import { hasClass } from '../utils.js';
-import { $body, $currentWindowRow, requestAction, isRow, isInput } from './common.js';
+import { $body, $currentWindowRow, isRow, isInput } from './common.js';
 import * as Omnibox from './omnibox.js';
 import * as Toolbar from './toolbar.js';
 import * as EditMode from './editmode.js';
+import * as Request from './request.js';
 import navigateByArrow from './navigation.js';
 
 const { $omnibox } = Omnibox;
@@ -25,7 +26,7 @@ function onClick(event) {
     const id = $target.id;
     if (id in Toolbar) return Toolbar[id]();
     if (EditMode.handleClick($target)) return;
-    requestAction(event, $target);
+    Request.action(event, $target);
 }
 
 function onRightClick(event) {
@@ -47,7 +48,7 @@ function onKeyUp(event) {
     const { key, target: $target } = event;
     inputEnterCheck.up(key, $target);
     if (EditMode.$active) return EditMode.handleKeyUp(key, $target);
-    if (isRow($target) && isClickKey(key)) return requestAction(event, $target);
+    if (isRow($target) && isClickKey(key)) return Request.action(event, $target);
     if ($target === $omnibox) {
         Omnibox.placeholder();
         Omnibox.handleKeyUp(key, event);

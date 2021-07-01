@@ -1,9 +1,15 @@
 import * as Settings from './settings.js';
 import * as Window from './window.js';
-import { set as setName } from './name.js';
+import * as Name from './name.js';
 import * as Action from './action.js';
 import * as Title from './title.js';
 let Badge, Stash, Menu; // Optional modules
+
+function debug() {
+    const modules = { Settings, Window, Name, Action, Title, Badge, Stash, Menu };
+    console.log(`Debug mode on - Exposing: ${Object.keys(modules).join(', ')}`);
+    Object.assign(window, modules);
+}
 
 init();
 Settings.needsRestart(false);
@@ -73,32 +79,19 @@ function onWindowFocused(windowId) {
 const isWindowBeingCreated = windowId => !(windowId in Window.winfoMap);
 
 async function onRequest(request) {
-
-    // From popup/init.js
-    if (request.popupError) return debug();
-    if (request.popup) {
-        return {
-            SETTINGS:         Settings.SETTINGS,
-            winfos:            Window.sortedWinfos(),
-            selectedTabCount: (await Action.getSelectedTabs()).length,
-        };
-    }
-
-    // From popup/popup.js
-    if (request.stash) return Stash.stash(request.stash);
-    if (request.action) return Action.execute(request);
-    if (request.help) return Action.openHelp();
-
-    // From popup/editmode.js
-    if (request.giveName) return setName(request.windowId, request.name);
+    if (request.popup) return {
+        SETTINGS:         Settings.SETTINGS,
+        winfos:           Window.sortedWinfos(),
+        selectedTabCount: (await Action.getSelectedTabs()).length,
+    };
+    if (request.stash)   return Stash.stash(request.stash);
+    if (request.action)  return Action.execute(request);
+    if (request.help)    return Action.openHelp();
+    if (request.setName) return Name.set(request.setName, request.name);
+    if (request.debug)   return debug();
 }
 
 export function onWindowNamed(windowId) {
     Title.update(windowId);
     Badge?.update(windowId);
-}
-
-function debug() {
-    Object.assign(window, { Window });
-    console.log(Window.winfoMap);
 }
